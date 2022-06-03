@@ -1,13 +1,16 @@
 import { Button, Checkbox, Dialog, DialogActions, DialogContent, DialogTitle, MenuItem, TextField } from '@mui/material'
 import React, { useEffect,useState } from 'react';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
+import { addTeamDetail } from '../redux/playerSlice';
+import PlayerList from './PlayerList';
 
 function FormModal() {
   const open = useSelector(state => state.data.FormModal);
   const teamDetail = useSelector(state => state.data.teamDetail);
+  const dispatch = useDispatch();
   const [title, setTitle] = useState('');
   const [index, setIndex] = useState(0);
-
+  
   const [players, setPlayers] = useState([]);
   const [data, setData] = useState({
     name:'',
@@ -19,15 +22,10 @@ function FormModal() {
   const handleClose = () => {
       // setOpen(false);
   };
-  useEffect(() => {
-    if(teamDetail.length > 0){
-       setTitle(teamDetail[0].name)
-    }
-  }, [teamDetail]);
-
+ 
   const addPlayerDetail = ()=>{
     if(players.length > 10){
-      console.log('-----errr---')
+      alert('You have added all the players for this team.Please press continue for the next team.')
     }
     else{
       let _players = [...players]
@@ -39,15 +37,13 @@ function FormModal() {
       }
       _players.push(data)
       setPlayers(_players)
-  
-      setData({
-        name:'',
-        category:'',
-        isCaptain:false,
-        isViceCaptain:false
-      })
     }
-    
+    setData({
+      name:'',
+      category:'',
+      isCaptain:false,
+      isViceCaptain:false
+    })
   }
 
   const checkCaptain = ()=>{
@@ -70,10 +66,57 @@ function FormModal() {
     setPlayers(_players)
   }
 
-  const handleContinue =()=>{
-      console.log(1111,players)
+  const checkTeam = () =>{
+    if(teamDetail.length > 0){
+      const find = teamDetail.find((item,i) => item.players.length === 0)
+      const index = teamDetail.findIndex((item,i) => item.players.length === 0)
+      if(find){
+        setTitle(find.name)
+        setIndex(index)
+      }
+      else{
+        alert('You have added all the players successfully.')
+      }
+    }
   }
 
+  const isCaptainExist = ()=>{
+    let _players = [...players]
+    const find = players.find(item => item.isCaptain === true)
+    if(!find){
+      let _players = [...players]
+      players[0].isCaptain = true
+      setPlayers(_players)
+    }
+  }
+  const isViceCaptainExist = ()=>{
+    let _players = [...players]
+    const find = players.find(item => item.isViceCaptain === true)
+    if(!find){
+      let _players = [...players]
+      players[1].isViceCaptain = true
+      setPlayers(_players)
+    }
+  }
+
+  useEffect(() => {
+    checkTeam()
+    console.log('teamDetail',teamDetail)
+  }, [teamDetail]);
+
+  const handleContinue =()=>{
+    if(players.length === 11){
+      isCaptainExist()
+      isViceCaptainExist()
+      let _teamDetail = [...teamDetail]
+      _teamDetail[index] = Object.assign({}, _teamDetail[index], {players:players})
+      dispatch(addTeamDetail(_teamDetail))
+      setPlayers([])
+    }
+    else{
+      alert("Add details of all the players to continue.")
+    }
+  }
     return (<>
         <Dialog
         open={open}
@@ -117,6 +160,9 @@ function FormModal() {
               <Button onClick={addPlayerDetail} variant="contained">Add Player Detail</Button>
             </div>
             
+        </DialogContent>
+        <DialogContent>
+          <PlayerList players={players}/>
         </DialogContent>
         <DialogActions>
           <Button onClick={handleContinue}>Continue</Button>

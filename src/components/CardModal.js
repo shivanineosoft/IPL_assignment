@@ -17,7 +17,7 @@ function CardModal() {
         setOpen(false);
     };
     const handleSelect =(value,name)=>{
-        let temp = {name:name,value:value}
+        let temp = {name:name,value:value,players:[]}
         let _arr = [...arr]
         _arr = _arr.filter((item) => item.name !== name)
         _arr.push(temp)
@@ -25,9 +25,14 @@ function CardModal() {
         setArr(_arr)
     }
     const handleSave =()=>{
-        dispatch(addTeamDetail(arr))
-        handleClose()
-        dispatch(toggleFormModal(true))
+        if(arr.length === 0){
+          alert('Please select team to continue.')
+        }
+        else{
+          dispatch(addTeamDetail(arr))
+          handleClose()
+          dispatch(toggleFormModal(true))
+        }
     }
     useEffect(() => {
         setOpen(true);
