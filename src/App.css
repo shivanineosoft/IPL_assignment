@@ -27,6 +27,16 @@
 .App-link {
   color: #61dafb;
 }
+.text-input {
+  border: solid 1px #dddddd;
+  padding: 10px;
+  height: 50px;
+}
+
+/* Hover styles below */
+.text-input:hover {
+  border: solid 1px #888888;
+}
 
 @keyframes App-logo-spin {
   from {
