@@ -9,15 +9,14 @@ export const playerSlice = createSlice({
   },
   reducers: {
     addTeamDetail: (state,value) => {
-        state.teamDetail = value.payload
+      state.teamDetail = value.payload
     },
     toggleFormModal: (state,value) => {
-        state.FormModal = value.payload
+      state.FormModal = value.payload
     },
   },
 })
 
-// Action creators are generated for each case reducer function
 export const { addTeamDetail,toggleFormModal } = playerSlice.actions
 
 export default playerSlice.reducer

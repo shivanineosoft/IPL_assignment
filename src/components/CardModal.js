@@ -47,7 +47,7 @@ function CardModal() {
         maxWidth="xl"
       >
         <DialogTitle id="alert-dialog-title">
-          <h4>Select Team</h4>
+        <b>Select Team</b>
         </DialogTitle>
         <DialogContent>
             <CardComponent name="RCB" handleSelect={handleSelect}/>

@@ -1,4 +1,4 @@
-import { Box, Button, Checkbox, Dialog, DialogActions, DialogContent, DialogTitle, FormControl, FormControlLabel, InputLabel, MenuItem, Select, TextField } from '@mui/material'
+import { Box, Button, Checkbox, Dialog, DialogActions, DialogContent, DialogTitle, FormControl, FormControlLabel, InputLabel, MenuItem, Select, TextField, Typography } from '@mui/material'
 import React, { useEffect,useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { addTeamDetail, toggleFormModal } from '../redux/playerSlice';
@@ -9,10 +9,12 @@ function FormModal() {
   const open = useSelector(state => state.data.FormModal);
   const teamDetail = useSelector(state => state.data.teamDetail);
   const dispatch = useDispatch();
+
   const [title, setTitle] = useState('');
   const [index, setIndex] = useState(0);
   const [showList, setList] = useState(false);
   const [players, setPlayers] = useState([]);
+  const [error, setError] = useState({name:'',category:''});
   const [data, setData] = useState({
     name:'',
     category:'',
@@ -21,26 +23,34 @@ function FormModal() {
   });
  
   const addPlayerDetail = ()=>{
-    if(players.length > 10){
-      alert('You have added all the players for this team.Please press continue for the next team.')
+    if(data.name === ''){
+      setError(p=>({...p,name:'This field is required.'}))
+    }
+    if(data.category === ''){
+      setError(p=>({...p,category:'This field is required.'}))
     }
     else{
-      let _players = [...players]
-      if(data.isCaptain){
-        checkCaptain()
+        if(players.length > 10){
+        alert('You have added all the players for this team.Please press continue for the next team.')
       }
-      if(data.isViceCaptain){
-        checkViceCaptain()
+      else{
+        let _players = [...players]
+        if(data.isCaptain){
+          checkCaptain()
+        }
+        if(data.isViceCaptain){
+          checkViceCaptain()
+        }
+        _players.push(data)
+        setPlayers(_players)
       }
-      _players.push(data)
-      setPlayers(_players)
+      setData({
+        name:'',
+        category:'',
+        isCaptain:false,
+        isViceCaptain:false
+      })
     }
-    setData({
-      name:'',
-      category:'',
-      isCaptain:false,
-      isViceCaptain:false
-    })
   }
 
   const checkCaptain = ()=>{
@@ -87,6 +97,7 @@ function FormModal() {
       setPlayers(_players)
     }
   }
+
   const isViceCaptainExist = ()=>{
     const find = players.find(item => item.isViceCaptain === true)
     if(!find){
@@ -98,7 +109,6 @@ function FormModal() {
 
   useEffect(() => {
     checkTeam()
-    console.log('teamDetail',teamDetail)
   }, [teamDetail]);
 
   const handleContinue =()=>{
@@ -116,55 +126,62 @@ function FormModal() {
   }
     return (<>
         <Dialog
-        open={open}
-        aria-labelledby="alert-dialog-title"
-        aria-describedby="alert-dialog-description"
-        maxWidth="lg"
-      >
+          open={open}
+          aria-labelledby="alert-dialog-title"
+          aria-describedby="alert-dialog-description"
+          maxWidth="lg"
+        >
         <DialogTitle id="alert-dialog-title">
-        <h4>Add Player Details of {title} Team</h4>
+          <b>Add Player Details of {title} Team</b>
         </DialogTitle>
-        <form>
         <DialogContent>
-              <div style={{margin:'10px'}}>
-                  <TextField id="outlined-basic" type="text" label="Name" variant="outlined" 
-                  value={data.name}
-                  required
-                  onChange={(e)=>{setData({...data,name:e.target.value})}} fullWidth/>
-              </div>
-              <div style={{margin:'10px'}}>
-              <Box sx={{ minWidth: 120 }}>
-                <FormControl fullWidth>
-                  <InputLabel id="demo-simple-select-label">Category</InputLabel>
-                  <Select
-                    labelId="demo-simple-select-label"
-                    id="demo-simple-select"
-                    value={data.category}
-                    label="Category"
-                    name="category"
-                    onChange={(e)=>{setData({...data,category:e.target.value})}}
-                  >
-                  <MenuItem value="All-rounder">All-rounder</MenuItem>
-                  <MenuItem value="Batsman">Batsman</MenuItem>
-                  <MenuItem value="Bowler">Bowler</MenuItem>
-                  <MenuItem value="Wicket keeper">Wicket keeper</MenuItem>
-                  </Select>
-                </FormControl>
-              </Box>
-              </div>
-              <div style={{margin:'10px'}}>
-                  <label>Captain</label>
-                  <Checkbox disabled={data.isViceCaptain} onChange={(e)=>{setData({...data,isCaptain:e.target.checked})}} checked={data.isCaptain}/>
-                  <label>Vice-captain</label>
-                  <Checkbox disabled={data.isCaptain} onChange={(e)=>{setData({...data,isViceCaptain:e.target.checked})}} checked={data.isViceCaptain}/>
-              </div>
-            <PlayerList players={players}/>
+          <div style={{margin:'10px'}}>
+              <TextField id="outlined-basic" type="text" label="Name" variant="outlined" 
+              value={data.name}
+              error={!!error.name}
+              onChange={(e)=>{
+                setError(p=>({...p,name:''}))
+                setData({...data,name:e.target.value})
+                }} fullWidth/>
+              {error.name && <Typography color="red">{error.name}</Typography>}
+          </div>
+          <div style={{margin:'10px'}}>
+          <Box sx={{ minWidth: 120 }}>
+            <FormControl fullWidth>
+              <InputLabel id="demo-simple-select-label">Category</InputLabel>
+              <Select
+                labelId="demo-simple-select-label"
+                id="demo-simple-select"
+                value={data.category}
+                label="Category"
+                name="category"
+                error={!!error.category}
+                onChange={(e)=>{
+                  setError(p=>({...p,category:''}))
+                  setData({...data,category:e.target.value})
+                }}
+              >
+                <MenuItem value="All-rounder">All-rounder</MenuItem>
+                <MenuItem value="Batsman">Batsman</MenuItem>
+                <MenuItem value="Bowler">Bowler</MenuItem>
+                <MenuItem value="Wicket keeper">Wicket keeper</MenuItem>
+              </Select>
+              {error.category && <Typography color="red">{error.category}</Typography>}
+            </FormControl>
+          </Box>
+          </div>
+          <div style={{margin:'10px'}}>
+              <label>Captain</label>
+              <Checkbox disabled={data.isViceCaptain} onChange={(e)=>{setData({...data,isCaptain:e.target.checked})}} checked={data.isCaptain}/>
+              <label>Vice-captain</label>
+              <Checkbox disabled={data.isCaptain} onChange={(e)=>{setData({...data,isViceCaptain:e.target.checked})}} checked={data.isViceCaptain}/>
+          </div>
+          <PlayerList players={players}/>
         </DialogContent>
         <DialogActions>
-          <Button onClick={addPlayerDetail} variant="contained" type="submit">Add Player Detail</Button>
+          <Button onClick={addPlayerDetail} variant="contained" type="button">Add Player Detail</Button>
           <Button onClick={handleContinue} variant="contained">Continue</Button>
         </DialogActions>
-        </form>
       </Dialog>
       {showList && <TeamList />}
       </>
