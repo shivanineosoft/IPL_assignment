@@ -1,8 +1,9 @@
-import { Button, Checkbox, Dialog, DialogActions, DialogContent, DialogTitle, MenuItem, TextField } from '@mui/material'
+import { Box, Button, Checkbox, Dialog, DialogActions, DialogContent, DialogTitle, FormControl, FormControlLabel, InputLabel, MenuItem, Select, TextField } from '@mui/material'
 import React, { useEffect,useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { addTeamDetail } from '../redux/playerSlice';
+import { addTeamDetail, toggleFormModal } from '../redux/playerSlice';
 import PlayerList from './PlayerList';
+import TeamList from './TeamList';
 
 function FormModal() {
   const open = useSelector(state => state.data.FormModal);
@@ -10,7 +11,7 @@ function FormModal() {
   const dispatch = useDispatch();
   const [title, setTitle] = useState('');
   const [index, setIndex] = useState(0);
-  
+  const [showList, setList] = useState(false);
   const [players, setPlayers] = useState([]);
   const [data, setData] = useState({
     name:'',
@@ -18,10 +19,6 @@ function FormModal() {
     isCaptain:false,
     isViceCaptain:false
   });
-
-  const handleClose = () => {
-      // setOpen(false);
-  };
  
   const addPlayerDetail = ()=>{
     if(players.length > 10){
@@ -76,12 +73,13 @@ function FormModal() {
       }
       else{
         alert('You have added all the players successfully.')
+        dispatch(toggleFormModal(false))
+        setList(true)
       }
     }
   }
 
   const isCaptainExist = ()=>{
-    let _players = [...players]
     const find = players.find(item => item.isCaptain === true)
     if(!find){
       let _players = [...players]
@@ -90,7 +88,6 @@ function FormModal() {
     }
   }
   const isViceCaptainExist = ()=>{
-    let _players = [...players]
     const find = players.find(item => item.isViceCaptain === true)
     if(!find){
       let _players = [...players]
@@ -120,57 +117,57 @@ function FormModal() {
     return (<>
         <Dialog
         open={open}
-        onClose={handleClose}
         aria-labelledby="alert-dialog-title"
         aria-describedby="alert-dialog-description"
-        fullWidth
         maxWidth="lg"
       >
         <DialogTitle id="alert-dialog-title">
-          Add Player Details of {title} Team
+        <h4>Add Player Details of {title} Team</h4>
         </DialogTitle>
+        <form>
         <DialogContent>
-            <div>
-                <input type="text" className="text-input" 
-                placeholder="Enter Player Name" name="name" 
-                value={data.name}
-                onChange={(e)=>{setData({...data,name:e.target.value})}}
-                style={{height:'40px'}}/>
-            </div>
-            <div>
-              <select 
-              onChange={(e)=>{setData({...data,category:e.target.value})}}
-              name="category" value={data.category}>
-                <option value="">Select</option>
-                <option value="All-rounder">All-rounder</option>
-                <option value="Batsman">Batsman</option>
-                <option value="Bowler">Bowler</option>
-                <option value="Wicket keeper">Wicket keeper</option>
-              </select>
-            </div>
-            <div>
-                <label>Captain</label>
-                <Checkbox disabled={data.isViceCaptain} onChange={(e)=>{setData({...data,isCaptain:e.target.checked})}} checked={data.isCaptain}/>
-            </div>
-            <div>
-                <label>Vice-captain</label>
-                <Checkbox disabled={data.isCaptain} onChange={(e)=>{setData({...data,isViceCaptain:e.target.checked})}} checked={data.isViceCaptain}/>
-            </div>
-            <div>
-              <Button onClick={addPlayerDetail} variant="contained">Add Player Detail</Button>
-            </div>
-            
-        </DialogContent>
-        <DialogContent>
-          <PlayerList players={players}/>
+              <div style={{margin:'10px'}}>
+                  <TextField id="outlined-basic" type="text" label="Name" variant="outlined" 
+                  value={data.name}
+                  required
+                  onChange={(e)=>{setData({...data,name:e.target.value})}} fullWidth/>
+              </div>
+              <div style={{margin:'10px'}}>
+              <Box sx={{ minWidth: 120 }}>
+                <FormControl fullWidth>
+                  <InputLabel id="demo-simple-select-label">Category</InputLabel>
+                  <Select
+                    labelId="demo-simple-select-label"
+                    id="demo-simple-select"
+                    value={data.category}
+                    label="Category"
+                    name="category"
+                    onChange={(e)=>{setData({...data,category:e.target.value})}}
+                  >
+                  <MenuItem value="All-rounder">All-rounder</MenuItem>
+                  <MenuItem value="Batsman">Batsman</MenuItem>
+                  <MenuItem value="Bowler">Bowler</MenuItem>
+                  <MenuItem value="Wicket keeper">Wicket keeper</MenuItem>
+                  </Select>
+                </FormControl>
+              </Box>
+              </div>
+              <div style={{margin:'10px'}}>
+                  <label>Captain</label>
+                  <Checkbox disabled={data.isViceCaptain} onChange={(e)=>{setData({...data,isCaptain:e.target.checked})}} checked={data.isCaptain}/>
+                  <label>Vice-captain</label>
+                  <Checkbox disabled={data.isCaptain} onChange={(e)=>{setData({...data,isViceCaptain:e.target.checked})}} checked={data.isViceCaptain}/>
+              </div>
+            <PlayerList players={players}/>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleContinue}>Continue</Button>
-          <Button onClick={handleClose} autoFocus type="button">
-            Close
-          </Button>
+          <Button onClick={addPlayerDetail} variant="contained" type="submit">Add Player Detail</Button>
+          <Button onClick={handleContinue} variant="contained">Continue</Button>
         </DialogActions>
-      </Dialog></>
+        </form>
+      </Dialog>
+      {showList && <TeamList />}
+      </>
     )
 }
 

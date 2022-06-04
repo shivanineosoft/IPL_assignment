@@ -10,7 +10,7 @@ function CardComponent({name, handleSelect}) {
         <Card sx={{ minWidth: 100,float:'left',margin:'10px' }}>
             <CardContent>
                 <Typography sx={{ fontSize: 14,textAlign:'center' }}  gutterBottom>
-                    {name}
+                    <b>{name}</b>
                 </Typography>
             </CardContent>
             <CardActions>

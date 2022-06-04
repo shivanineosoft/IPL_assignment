@@ -1,6 +1,6 @@
 import { Box, Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Typography } from '@mui/material';
 import React,{useEffect,useState} from 'react'
-import { useSelector,useDispatch } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import { addTeamDetail, toggleFormModal } from '../redux/playerSlice';
 import CardComponent from './CardComponent';
 import FormModal from './FormModal';
@@ -10,7 +10,6 @@ function CardModal() {
     const [open, setOpen] = useState(false);
     const [arr, setArr] = useState([]);
 
-    const name = useSelector(state => state.data);
     const dispatch = useDispatch();
 
     const handleClose = () => {
@@ -45,9 +44,10 @@ function CardModal() {
         onClose={handleClose}
         aria-labelledby="alert-dialog-title"
         aria-describedby="alert-dialog-description"
+        maxWidth="xl"
       >
         <DialogTitle id="alert-dialog-title">
-          Select Team
+          <h4>Select Team</h4>
         </DialogTitle>
         <DialogContent>
             <CardComponent name="RCB" handleSelect={handleSelect}/>
@@ -57,10 +57,7 @@ function CardModal() {
             <CardComponent name="MI" handleSelect={handleSelect}/>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleSave}>Continue</Button>
-          <Button onClick={handleClose} autoFocus>
-            Close
-          </Button>
+          <Button onClick={handleSave} variant="contained">Continue</Button>
         </DialogActions>
       </Dialog>
       <FormModal />
